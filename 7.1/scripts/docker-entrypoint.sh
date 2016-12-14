@@ -4,6 +4,8 @@ set -e
 
 phpini=/usr/local/etc/php/php.ini
 
+RUNPODS=${RUNPODS:-Off}
+
 # php environment
 PHP_ALLOW_URL_FOPEN=${PHP_ALLOW_URL_FOPEN:-On}
 PHP_DISPLAY_ERRORS=${PHP_DISPLAY_ERRORS:-Off}
@@ -31,7 +33,9 @@ PHP_MODULE_XCACHE=${PHP_MODULE_XCACHE:-Off}
 echo ${PHP_TIMEZONE} | tee /etc/timezone
 dpkg-reconfigure --frontend noninteractive tzdata
 
-sed -i "s/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/g" /usr/local/etc/php-fpm.d/www.conf
+if [ ${RUNPODS} == 'Off' ]; then
+    sed -i "s/listen = 127.0.0.1:9000/listen = 0.0.0.0:9000/g" /usr/local/etc/php-fpm.d/www.conf
+fi
 
 if [ -f /var/www/html/config/php/pool.conf ]; then
     cp /var/www/html/config/php/pool.conf /usr/local/etc/php-fpm.d/www.conf
